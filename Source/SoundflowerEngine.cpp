@@ -28,6 +28,8 @@
 #include <IOKit/IOWorkLoop.h>
 #include <IOKit/IOTimerEventSource.h>
 
+#define LOG_DAT_SHIT 1
+
 #define INITIAL_SAMPLE_RATE	44100
 #define BLOCK_SIZE		512		// Sample frames
 #define NUM_BLOCKS		32
@@ -44,8 +46,10 @@ bool SoundflowerEngine::init(OSDictionary *properties)
     bool result = false;
     OSNumber *number = NULL;
     
-	//IOLog("SoundflowerEngine[%p]::init()\n", this);
-
+#if LOG_DAT_SHIT
+	IOLog("SoundflowerEngine[%p]::init()\n", this);
+#endif
+    
     if (!super::init(properties)) {
         goto Done;
     }
@@ -203,7 +207,9 @@ bool SoundflowerEngine::initHardware(IOService *provider)
     IOAudioSampleRate initialSampleRate;
     IOWorkLoop *wl;
     
-    //IOLog("SoundflowerEngine[%p]::initHardware(%p)\n", this, provider);
+#if LOG_DAT_SHIT
+    IOLog("SoundflowerEngine[%p]::initHardware(%p)\n", this, provider);
+#endif
     
     duringHardwareInit = TRUE;
     
@@ -266,6 +272,7 @@ bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
     OSString*		desc;
     
     desc = OSDynamicCast(OSString, getProperty(DESCRIPTION_KEY));
+    // description
     if (desc)
         setDescription(desc->getCStringNoCopy());
     
@@ -383,8 +390,11 @@ bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
         }
         
         mBufferSize = blockSize * numBlocks * maxNumChannels * maxBitWidth / 8;
-        //IOLog("Soundflower streamBufferSize: %ld\n", mBufferSize);
-		
+        
+#if LOG_DAT_SHIT
+        IOLog("Soundflower streamBufferSize: %ld\n", (long int)mBufferSize);
+#endif
+        
         if (mBuffer == NULL) {
             mBuffer = (void *)IOMalloc(mBufferSize);
             if (!mBuffer) {
@@ -447,7 +457,9 @@ Done:
  
 void SoundflowerEngine::free()
 {
-	//IOLog("SoundflowerEngine[%p]::free()\n", this);
+#if LOG_DAT_SHIT
+	IOLog("SoundflowerEngine[%p]::free()\n", this);
+#endif
     
     if (mBuffer) {
         IOFree(mBuffer, mBufferSize);
@@ -494,8 +506,10 @@ IOReturn SoundflowerEngine::performAudioEngineStart()
  
 IOReturn SoundflowerEngine::performAudioEngineStop()
 {
-    //IOLog("SoundflowerEngine[%p]::performAudioEngineStop()\n", this);
-     
+#if LOG_DAT_SHIT
+    IOLog("SoundflowerEngine[%p]::performAudioEngineStop()\n", this);
+#endif
+    
     timerEventSource->cancelTimeout();
     
     return kIOReturnSuccess;
@@ -504,7 +518,9 @@ IOReturn SoundflowerEngine::performAudioEngineStop()
  
 UInt32 SoundflowerEngine::getCurrentSampleFrame()
 {
-    //IOLog("SoundflowerEngine[%p]::getCurrentSampleFrame() - currentBlock = %lu\n", this, currentBlock);
+#if LOG_DAT_SHIT
+    IOLog("SoundflowerEngine[%p]::getCurrentSampleFrame() - currentBlock = %lu\n", this, (long unsigned int)currentBlock);
+#endif
     
     // In order for the erase process to run properly, this function must return the current location of
     // the audio engine - basically a sample counter
@@ -520,7 +536,9 @@ UInt32 SoundflowerEngine::getCurrentSampleFrame()
 IOReturn SoundflowerEngine::performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate)
 {     
     if (!duringHardwareInit) {
-  //      IOLog("SoundflowerEngine[%p]::peformFormatChange(%p, %p, %p)\n", this, audioStream, newFormat, newSampleRate);
+#if LOG_DAT_SHIT
+        IOLog("SoundflowerEngine[%p]::peformFormatChange(%p, %p, %p)\n", this, audioStream, newFormat, newSampleRate);
+#endif
     }
 
     // It is possible that this function will be called with only a format or only a sample rate
@@ -586,7 +604,7 @@ IOReturn SoundflowerEngine::clipOutputSamples(const void *mixBuf, void *sampleBu
     UInt32				numBytes = numSampleFrames * channelCount * sizeof(float);
 	SoundflowerDevice*	device = (SoundflowerDevice*)audioDevice;
 	
-#if 0
+#if LOG_DAT_SHIT
 	IOLog("SoundflowerEngine[%p]::clipOutputSamples() -- channelCount:%u \n", this, (uint)channelCount);
 	IOLog("    input -- numChannels: %u", (uint)inputStream->format.fNumChannels);
 	IOLog("    bitDepth: %u", (uint)inputStream->format.fBitDepth);
@@ -598,7 +616,7 @@ IOReturn SoundflowerEngine::clipOutputSamples(const void *mixBuf, void *sampleBu
 	IOLog("    \n");
 #endif
 	
-#if 0
+#if LOG_DAT_SHIT
 	IOLog("INPUT: firstSampleFrame: %u   numSampleFrames: %u \n", (uint)firstSampleFrame, (uint)numSampleFrames);
 #endif
 	mLastValidSampleFrame = firstSampleFrame+numSampleFrames;
@@ -642,8 +660,8 @@ IOReturn SoundflowerEngine::convertInputSamples(const void *sampleBuf, void *des
     UInt32				offset = firstSampleFrame * frameSize;
 	SoundflowerDevice*	device = (SoundflowerDevice*)audioDevice;
 
-#if 0
-	//IOLog("SoundflowerEngine[%p]::convertInputSamples() -- channelCount:%u \n", this, (uint)streamFormat->fNumChannels);
+#if LOG_DAT_SHIT
+	IOLog("SoundflowerEngine[%p]::convertInputSamples() -- channelCount:%u \n", this, (uint)streamFormat->fNumChannels);
 	IOLog("OUTPUT: firstSampleFrame: %u   numSampleFrames: %u \n", (uint)firstSampleFrame, (uint)numSampleFrames);
 	IOLog("    mLastValidSampleFrame: %u  (diff: %ld)   \n", (uint)mLastValidSampleFrame, long(mLastValidSampleFrame) - long(firstSampleFrame+numSampleFrames));
 #endif 
