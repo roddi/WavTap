@@ -18,3 +18,5 @@ xcuserdata
 
 build
 .DS_Store
+Installer/_error.log
+Installer/_installer.log
