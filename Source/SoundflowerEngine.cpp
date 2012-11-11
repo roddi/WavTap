@@ -263,26 +263,23 @@ Done:
 bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
 {
     bool			result = false;
-    OSNumber*		number = NULL;
     UInt32			numStreams;
 	UInt32			streamNum;
-    OSArray*		formatArray = NULL;
 	OSArray*		sampleRateArray = NULL;
     UInt32			startingChannelID = 1;
-    OSString*		desc;
     
-    desc = OSDynamicCast(OSString, getProperty(DESCRIPTION_KEY));
     // description
+    OSString* desc = OSDynamicCast(OSString, getProperty(DESCRIPTION_KEY));
     if (desc)
         setDescription(desc->getCStringNoCopy());
     
-    number = OSDynamicCast(OSNumber, getProperty(NUM_STREAMS_KEY));
+    OSNumber* number = OSDynamicCast(OSNumber, getProperty(NUM_STREAMS_KEY));
     if (number)
         numStreams = number->unsigned32BitValue();
 	else
         numStreams = NUM_STREAMS;
     
-    formatArray = OSDynamicCast(OSArray, getProperty(FORMATS_KEY));
+    OSArray* formatArray = OSDynamicCast(OSArray, getProperty(FORMATS_KEY));
     if (formatArray == NULL) {
 		IOLog("SF formatArray is NULL\n");
         goto Done;
