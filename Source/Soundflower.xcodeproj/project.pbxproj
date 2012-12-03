@@ -11,6 +11,7 @@
 		54D0AD970A5E329B006380BD /* SoundflowerEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = C93407630601317E002E6A19 /* SoundflowerEngine.h */; };
 		54D0AD9B0A5E329B006380BD /* SoundflowerEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C93407640601317E002E6A19 /* SoundflowerEngine.cpp */; };
 		54D0AD9D0A5E329B006380BD /* SoundflowerDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C93407660601317E002E6A19 /* SoundflowerDevice.cpp */; };
+		DDD1E074164FEC990052E0BB /* ToDo.rtf in Resources */ = {isa = PBXBuildFile; fileRef = DDD1E073164FEC990052E0BB /* ToDo.rtf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		C93407630601317E002E6A19 /* SoundflowerEngine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SoundflowerEngine.h; sourceTree = "<group>"; };
 		C93407640601317E002E6A19 /* SoundflowerEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = SoundflowerEngine.cpp; sourceTree = "<group>"; };
 		C93407660601317E002E6A19 /* SoundflowerDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = SoundflowerDevice.cpp; sourceTree = "<group>"; };
+		DDD1E073164FEC990052E0BB /* ToDo.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = ToDo.rtf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +41,7 @@
 			isa = PBXGroup;
 			children = (
 				2249EC7E0ED70C7E003C8357 /* Soundflower.xcconfig */,
+				DDD1E073164FEC990052E0BB /* ToDo.rtf */,
 				247142CAFF3F8F9811CA285C /* Source */,
 				089C167CFE841241C02AAC07 /* Resources */,
 				19C28FB6FE9D52B211CA2CBB /* Products */,
@@ -141,6 +144,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DDD1E074164FEC990052E0BB /* ToDo.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -51,8 +51,9 @@ class SoundflowerEngine : public IOAudioEngine
 
     bool				duringHardwareInit;
     
-	float             logTable[100] ; // Lookup for logarithmic volume scaling.
+	float               logTable[100] ; // Lookup for logarithmic volume scaling.
 
+    bool                isDependendEngine;
 	
 public:
 
