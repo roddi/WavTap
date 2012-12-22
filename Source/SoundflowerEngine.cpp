@@ -213,19 +213,22 @@ bool SoundflowerEngine::initHardware(IOService *provider)
     
     duringHardwareInit = TRUE;
     
-    if (!super::initHardware(provider)) {
+    if (!super::initHardware(provider))
+    {
         goto Done;
     }
     
     initialSampleRate.whole = 0;
     initialSampleRate.fraction = 0;
 
-    if (!createAudioStreams(&initialSampleRate)) {
+    if (!createAudioStreams(&initialSampleRate))
+    {
 		IOLog("SoundflowerEngine::initHardware() failed\n");
         goto Done;
     }
 	
-    if (initialSampleRate.whole == 0) {
+    if (initialSampleRate.whole == 0)
+    {
         goto Done;
     }
     
@@ -240,7 +243,8 @@ bool SoundflowerEngine::initHardware(IOService *provider)
     setNumSampleFramesPerBuffer(blockSize * numBlocks);
     
     wl = getWorkLoop();
-    if (!wl) {
+    if (!wl)
+    {
         goto Done;
     }
     
@@ -331,38 +335,46 @@ bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
         }
         
         formatIterator = OSCollectionIterator::withCollection(formatArray);
-        if (!formatIterator) {
+        if (!formatIterator)
+        {
 			IOLog("SF NULL formatIterator\n");
             goto Error;
         }
         
         sampleRateIterator = OSCollectionIterator::withCollection(sampleRateArray);
-        if (!sampleRateIterator) {
+        if (!sampleRateIterator)
+        {
 			IOLog("SF NULL sampleRateIterator\n");
             goto Error;
         }
         
         formatIterator->reset();
-        while ((formatDict = (OSDictionary *)formatIterator->getNextObject())) {
+        while ((formatDict = (OSDictionary *)formatIterator->getNextObject()))
+        {
             IOAudioStreamFormat format;
             
-            if (OSDynamicCast(OSDictionary, formatDict) == NULL) {
+            if (OSDynamicCast(OSDictionary, formatDict) == NULL)
+            {
 				IOLog("SF error casting formatDict\n");
                 goto Error;
             }
             
-            if (IOAudioStream::createFormatFromDictionary(formatDict, &format) == NULL) {
+            if (IOAudioStream::createFormatFromDictionary(formatDict, &format) == NULL)
+            {
 				IOLog("SF error in createFormatFromDictionary()\n");
 				goto Error;
             }
             
-            if (!initialFormatSet) {
+            if (!initialFormatSet)
+            {
                 initialFormat = format;
             }
             
             sampleRateIterator->reset();
-            while ((number = (OSNumber *)sampleRateIterator->getNextObject())) {
-                if (!OSDynamicCast(OSNumber, number)) {
+            while ((number = (OSNumber *)sampleRateIterator->getNextObject()))
+            {
+                if (!OSDynamicCast(OSNumber, number))
+                {
 					IOLog("SF error iterating sample rates\n");
                     goto Error;
                 }
@@ -372,15 +384,18 @@ bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
                 inputStream->addAvailableFormat(&format, &sampleRate, &sampleRate);
 				outputStream->addAvailableFormat(&format, &sampleRate, &sampleRate);
                 
-                if (format.fNumChannels > maxNumChannels) {
+                if (format.fNumChannels > maxNumChannels)
+                {
                     maxNumChannels = format.fNumChannels;
                 }
                 
-                if (format.fBitWidth > maxBitWidth) {
+                if (format.fBitWidth > maxBitWidth)
+                {
                     maxBitWidth = format.fBitWidth;
                }
                 
-                if (initialSampleRate->whole == 0) {
+                if (initialSampleRate->whole == 0)
+                {
                     initialSampleRate->whole = sampleRate.whole;
                 }
             }
@@ -392,15 +407,18 @@ bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
         IOLog("Soundflower streamBufferSize: %ld\n", (long int)mBufferSize);
 #endif
         
-        if (mBuffer == NULL) {
+        if (mBuffer == NULL)
+        {
             mBuffer = (void *)IOMalloc(mBufferSize);
-            if (!mBuffer) {
+            if (!mBuffer)
+            {
                 IOLog("Soundflower: Error allocating output buffer - %lu bytes.\n", (unsigned long)mBufferSize);
                 goto Error;
             }
 			
             mThruBuffer = (float*)IOMalloc(mBufferSize);
-            if (!mThruBuffer) {
+            if (!mThruBuffer)
+            {
                 IOLog("Soundflower: Error allocating thru buffer - %lu bytes.\n", (unsigned long)mBufferSize);
                 goto Error;
             }
@@ -420,9 +438,9 @@ bool SoundflowerEngine::createAudioStreams(IOAudioSampleRate *initialSampleRate)
         formatIterator->release();
         sampleRateIterator->release();
         
-        for (channelID = startingChannelID; channelID < (startingChannelID + maxNumChannels); channelID++) {
+        for (channelID = startingChannelID; channelID < (startingChannelID + maxNumChannels); channelID++)
+        {
             char channelName[20];
-            
             snprintf(channelName, 20, "Channel %u", (unsigned int)channelID);
         }
         
@@ -592,7 +610,7 @@ void SoundflowerEngine::ourTimerFired(OSObject *target, IOTimerEventSource *send
     }
 }
 
-
+// receive audio FROM CoreAudio move to hardware
 IOReturn SoundflowerEngine::clipOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream)
 {
     UInt32				channelCount = streamFormat->fNumChannels;
@@ -624,12 +642,15 @@ IOReturn SoundflowerEngine::clipOutputSamples(const void *mixBuf, void *sampleBu
 	
 	if (device->mMuteIn[0])
     {
-		memset((UInt8*)mThruBuffer + byteOffset, 0, numBytes);
+		// set thru buffer to zeros
+        memset((UInt8*)mThruBuffer + byteOffset, 0, numBytes);
 	}
 	else
     {
+        // copy input to thru buffer
 		memcpy((UInt8*)mThruBuffer + byteOffset, (UInt8 *)mixBuf + byteOffset, numBytes);
 		
+        // adjust gains and mutes
 		float masterGain = logTable[ device->mGain[0] ];
 		float masterVolume = logTable[ device->mVolume[0] ];
 		
@@ -653,6 +674,7 @@ IOReturn SoundflowerEngine::clipOutputSamples(const void *mixBuf, void *sampleBu
 }
 
 
+// put audio INTO CoreAudio get it from hardware.
 // This is called when client apps need input audio.  Here we give them saved audio from the clip routine.
 
 IOReturn SoundflowerEngine::convertInputSamples(const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream)
@@ -668,8 +690,10 @@ IOReturn SoundflowerEngine::convertInputSamples(const void *sampleBuf, void *des
 #endif 
 	
     if (device->mMuteOut[0])
+        // copy zeroes to output
         memset((UInt8*)destBuf, 0, numSampleFrames * frameSize);
     else
+        // copy thru to output
         memcpy((UInt8*)destBuf, (UInt8*)mThruBuffer + offset, numSampleFrames * frameSize);
 	
     return kIOReturnSuccess;

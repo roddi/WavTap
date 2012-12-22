@@ -37,6 +37,8 @@
 #include <IOKit/audio/IOAudioDefines.h>
 #include <IOKit/IOLib.h>
 
+#define LOG_DEVICE 1
+
 #define super IOAudioDevice
 
 OSDefineMetaClassAndStructors(SoundflowerDevice, IOAudioDevice)
@@ -53,7 +55,9 @@ bool SoundflowerDevice::initHardware(IOService *provider)
 {
     bool result = false;
     
-	//IOLog("SoundflowerDevice[%p]::initHardware(%p)\n", this, provider);
+#if LOG_DEVICE
+	IOLog("SoundflowerDevice[%p]::initHardware(%p)\n", this, provider);
+#endif
     
     if (!super::initHardware(provider))
         goto Done;
