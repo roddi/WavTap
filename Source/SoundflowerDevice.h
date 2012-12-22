@@ -24,7 +24,8 @@
 
 #include <IOKit/audio/IOAudioDevice.h>
 
-#define AUDIO_ENGINES_KEY				"AudioEngines"
+#define AUDIO_ENGINES_WIDDERSHINS_KEY	"AudioEnginesWiddershins"
+#define AUDIO_ENGINE_TURNWISE_KEY		"AudioEngineTurnwise"
 #define DESCRIPTION_KEY					"Description"
 #define BLOCK_SIZE_KEY					"BlockSize"
 #define NUM_BLOCKS_KEY					"NumBlocks"

@@ -547,6 +547,22 @@ UInt32 SoundflowerEngine::getCurrentSampleFrame()
     return currentBlock * blockSize;
 }
 
+UInt32 SoundflowerEngine::getNumBlocks()
+{
+    return numBlocks;
+}
+
+bool SoundflowerEngine::getIsDependendEngine()
+{
+    return isDependendEngine;
+}
+
+void SoundflowerEngine::setIsDependendEngine(bool inIsDependendEngine)
+{
+    isDependendEngine = inIsDependendEngine;
+}
+
+
 
 IOReturn SoundflowerEngine::performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate)
 {     

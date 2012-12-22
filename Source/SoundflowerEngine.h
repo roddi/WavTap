@@ -68,6 +68,10 @@ public:
     virtual IOReturn performAudioEngineStop();
     
     virtual UInt32 getCurrentSampleFrame();
+    virtual UInt32 getNumBlocks();
+    
+    virtual bool getIsDependendEngine();
+    virtual void setIsDependendEngine(bool inIsDependendEngine);
     
     virtual IOReturn performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate);
 

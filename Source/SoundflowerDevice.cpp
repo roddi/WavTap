@@ -79,40 +79,75 @@ Done:
 
 bool SoundflowerDevice::createAudioEngines()
 {
-    OSArray*				audioEngineArray = OSDynamicCast(OSArray, getProperty(AUDIO_ENGINES_KEY));
-    OSCollectionIterator*	audioEngineIterator;
-    OSDictionary*			audioEngineDict;
+    OSArray*				audioEngineArray = OSDynamicCast(OSArray, getProperty(AUDIO_ENGINES_WIDDERSHINS_KEY));
 	
-    if (!audioEngineArray) {
+    if (!audioEngineArray)
+    {
         IOLog("SoundflowerDevice[%p]::createAudioEngine() - Error: no AudioEngine array in personality.\n", this);
         return false;
     }
     
-	audioEngineIterator = OSCollectionIterator::withCollection(audioEngineArray);
-    if (!audioEngineIterator) {
+	OSCollectionIterator*	audioEngineIterator = OSCollectionIterator::withCollection(audioEngineArray);
+    if (!audioEngineIterator)
+    {
 		IOLog("SoundflowerDevice: no audio engines available.\n");
 		return true;
 	}
     
-    while ((audioEngineDict = (OSDictionary*)audioEngineIterator->getNextObject())) {
-		SoundflowerEngine*	audioEngine = NULL;
+    int widdershinChannelCount = 0;
+    OSDictionary*	audioEngineDict = NULL;
+    while ((audioEngineDict = (OSDictionary*)audioEngineIterator->getNextObject()))
+    {
+		SoundflowerEngine*	widdershinAudioEngine = NULL;
 		
         if (OSDynamicCast(OSDictionary, audioEngineDict) == NULL)
             continue;
         
-		audioEngine = new SoundflowerEngine;
-        if (!audioEngine)
+		widdershinAudioEngine = new SoundflowerEngine;
+        if (!widdershinAudioEngine)
 			continue;
         
-        if (!audioEngine->init(audioEngineDict))
+        if (!widdershinAudioEngine->init(audioEngineDict))
 			continue;
 
-		initControls(audioEngine);
-        activateAudioEngine(audioEngine);	// increments refcount and manages the object
-        audioEngine->release();				// decrement refcount so object is released when the manager eventually releases it
+		initControls(widdershinAudioEngine);
+        activateAudioEngine(widdershinAudioEngine);	// increments refcount and manages the object
+        widdershinChannelCount += widdershinAudioEngine->getNumBlocks();
+        widdershinAudioEngine->setIsDependendEngine(true);
+        
+        widdershinAudioEngine->release();				// decrement refcount so object is released when the manager eventually releases it
     }
 	
     audioEngineIterator->release();
+    
+    do
+    {
+#if LOG_DEVICE
+        IOLog("SoundflowerDevice[%p]::createAudioEngines() create turnwise device\n", this);
+#endif
+        SoundflowerEngine*	turnwiseAudioEngine = NULL;
+        
+        OSDictionary*				audioEngineDictionary = OSDynamicCast(OSDictionary, getProperty(AUDIO_ENGINE_TURNWISE_KEY));
+
+        if (audioEngineDictionary == NULL)
+            continue;
+        
+        turnwiseAudioEngine = new SoundflowerEngine;
+        if (!turnwiseAudioEngine)
+            continue;
+        
+        if (!turnwiseAudioEngine->init(audioEngineDictionary))
+            continue;
+        
+        initControls(turnwiseAudioEngine);
+        activateAudioEngine(turnwiseAudioEngine);	// increments refcount and manages the object
+        widdershinChannelCount += turnwiseAudioEngine->getNumBlocks();
+        turnwiseAudioEngine->setIsDependendEngine(true);
+        
+        turnwiseAudioEngine->release();				// decrement refcount so object is released when the manager eventually releases it
+    }
+    while (false);
+    
     return true;
 }
 
