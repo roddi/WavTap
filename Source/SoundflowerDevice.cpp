@@ -39,6 +39,7 @@
 
 #define LOG_DEVICE 1
 
+
 #define super IOAudioDevice
 
 OSDefineMetaClassAndStructors(SoundflowerDevice, IOAudioDevice)
@@ -94,9 +95,9 @@ bool SoundflowerDevice::createAudioEngines()
 		return true;
 	}
     
-    int widdershinChannelCount = 0;
+    UInt32 widdershinEngineCount = 0;
     OSDictionary*	audioEngineDict = NULL;
-    while ((audioEngineDict = (OSDictionary*)audioEngineIterator->getNextObject()))
+    while ((audioEngineDict = (OSDictionary*)audioEngineIterator->getNextObject()) && widdershinEngineCount<kMaxDependendAudioEngines)
     {
 		SoundflowerEngine*	widdershinAudioEngine = NULL;
 		
@@ -110,22 +111,29 @@ bool SoundflowerDevice::createAudioEngines()
         if (!widdershinAudioEngine->init(audioEngineDict))
 			continue;
 
+        widdershinAudioEngine->setIsDependendEngine(true);
+        widdershinAudioEngine->numOtherEngines = 1;
+        widdershinAudioEngine->ownIndex = widdershinEngineCount;
+        
 		initControls(widdershinAudioEngine);
         activateAudioEngine(widdershinAudioEngine);	// increments refcount and manages the object
-        widdershinChannelCount += widdershinAudioEngine->getNumBlocks();
-        widdershinAudioEngine->setIsDependendEngine(true);
+        
+        widdershinEngines[widdershinEngineCount] = widdershinAudioEngine;
+        
+        widdershinEngineCount++;
         
         widdershinAudioEngine->release();				// decrement refcount so object is released when the manager eventually releases it
     }
 	
     audioEngineIterator->release();
     
+    SoundflowerEngine*	turnwiseAudioEngine = NULL;
+
     do
     {
 #if LOG_DEVICE
         IOLog("SoundflowerDevice[%p]::createAudioEngines() create turnwise device\n", this);
 #endif
-        SoundflowerEngine*	turnwiseAudioEngine = NULL;
         
         OSDictionary*				audioEngineDictionary = OSDynamicCast(OSDictionary, getProperty(AUDIO_ENGINE_TURNWISE_KEY));
 
@@ -141,12 +149,21 @@ bool SoundflowerDevice::createAudioEngines()
         
         initControls(turnwiseAudioEngine);
         activateAudioEngine(turnwiseAudioEngine);	// increments refcount and manages the object
-        widdershinChannelCount += turnwiseAudioEngine->getNumBlocks();
-        turnwiseAudioEngine->setIsDependendEngine(true);
+        widdershinEngineCount += turnwiseAudioEngine->getNumBlocks();
+        turnwiseAudioEngine->setIsDependendEngine(false);
+
+        turnwiseAudioEngine->otherEngines = &turnwiseAudioEngine;
+        turnwiseAudioEngine->numOtherEngines = widdershinEngineCount;
+        turnwiseAudioEngine->ownIndex = 0;
         
         turnwiseAudioEngine->release();				// decrement refcount so object is released when the manager eventually releases it
     }
     while (false);
+    
+    for (UInt32 i=0; i<widdershinEngineCount; i++)
+    {
+        widdershinEngines[i]->otherEngines = &turnwiseAudioEngine;
+    }
     
     return true;
 }

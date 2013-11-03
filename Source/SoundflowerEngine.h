@@ -53,10 +53,13 @@ class SoundflowerEngine : public IOAudioEngine
     
 	float               logTable[100] ; // Lookup for logarithmic volume scaling.
 
-    bool                isDependendEngine;
-	
 public:
 
+    bool                isDependendEngine;
+    SoundflowerEngine   **otherEngines;
+    UInt32              numOtherEngines;
+    UInt32              ownIndex;
+	
     virtual bool init(OSDictionary *properties);
     virtual void free();
     
@@ -69,6 +72,7 @@ public:
     
     virtual UInt32 getCurrentSampleFrame();
     virtual UInt32 getNumBlocks();
+    virtual float* getThruBuffer();
     
     virtual bool getIsDependendEngine();
     virtual void setIsDependendEngine(bool inIsDependendEngine);

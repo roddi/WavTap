@@ -562,7 +562,10 @@ void SoundflowerEngine::setIsDependendEngine(bool inIsDependendEngine)
     isDependendEngine = inIsDependendEngine;
 }
 
-
+float* SoundflowerEngine::getThruBuffer()
+{
+    return mThruBuffer;
+}
 
 IOReturn SoundflowerEngine::performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate)
 {     

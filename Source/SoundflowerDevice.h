@@ -36,6 +36,9 @@
 #define SEPARATE_INPUT_BUFFERS_KEY		"SeparateInputBuffers"
 #define SoundflowerDevice				com_cycling74_driver_SoundflowerDevice
 
+#define kMaxDependendAudioEngines 64
+
+
 class SoundflowerEngine;
 
 class SoundflowerDevice : public IOAudioDevice
@@ -56,6 +59,8 @@ class SoundflowerDevice : public IOAudioDevice
     SInt32 mMuteIn[NUM_CHANS+1];
     SInt32 mGain[NUM_CHANS+1];
 
+public:
+    SoundflowerEngine *widdershinEngines[kMaxDependendAudioEngines];
 	
 	// methods
 	
